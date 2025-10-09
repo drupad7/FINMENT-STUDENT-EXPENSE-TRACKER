@@ -7,24 +7,21 @@ import java.util.*;
 @RequestMapping("/api/expenses")
 public class ExpenseController {
 
-    // In-memory list (no database for now)
     private final List<Map<String, Object>> transactions = new ArrayList<>();
 
-    // ✅ Get all expenses
     @GetMapping
     public List<Map<String, Object>> getAllExpenses() {
         return transactions;
     }
 
-    // ✅ Add a new expense
     @PostMapping
     public Map<String, Object> addExpense(@RequestBody Map<String, Object> expense) {
-        expense.put("id", UUID.randomUUID().toString()); // generate unique ID
+        expense.put("id", UUID.randomUUID().toString()); 
         transactions.add(expense);
         return expense;
     }
 
-    // ✅ Get expenses for a specific date (yyyy-MM-dd)
+   
     @GetMapping("/date/{date}")
     public List<Map<String, Object>> getExpensesByDate(@PathVariable String date) {
         List<Map<String, Object>> result = new ArrayList<>();
@@ -36,12 +33,12 @@ public class ExpenseController {
         return result;
     }
 
-    // ✅ Get total for a month (yyyy-MM)
+ 
     @GetMapping("/month/{month}")
     public double getMonthlyTotal(@PathVariable String month) {
         double total = 0;
         for (Map<String, Object> exp : transactions) {
-            String date = (String) exp.get("date"); // format: yyyy-MM-dd
+            String date = (String) exp.get("date"); 
             if (date != null && date.startsWith(month)) {
                 Object amt = exp.get("amount");
                 if (amt instanceof Number) {
@@ -52,10 +49,11 @@ public class ExpenseController {
         return total;
     }
 
-    // ✅ Delete an expense by ID
+   
     @DeleteMapping("/{id}")
     public String deleteExpense(@PathVariable String id) {
         boolean removed = transactions.removeIf(exp -> exp.get("id").equals(id));
         return removed ? "Deleted successfully!" : "Expense not found!";
     }
 }
+
