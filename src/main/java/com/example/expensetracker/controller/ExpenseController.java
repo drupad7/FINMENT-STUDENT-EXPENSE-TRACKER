@@ -10,11 +10,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/expenses")
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5500") // allow frontend at port 5500
 public class ExpenseController {
 
     @Autowired
@@ -23,17 +25,21 @@ public class ExpenseController {
     @Autowired
     private UserDAO userDAO;
 
-    // ➕ Add new expense (frontend posts to /api/expenses/add with { email, amount, category, wallet, note, date })
+    // ➕ Add Expense
     @PostMapping("/add")
-    public ResponseEntity<String> addExpenseByEmail(@RequestBody ExpenseRequest req) {
+    public ResponseEntity<Map<String, String>> addExpenseByEmail(@RequestBody ExpenseRequest req) {
+        Map<String, String> response = new HashMap<>();
+
         try {
             if (req.getEmail() == null || req.getEmail().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email required");
+                response.put("message", "Email is required");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             User user = userDAO.findByEmail(req.getEmail());
             if (user == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
+                response.put("message", "User not found");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
             }
 
             Expense expense = new Expense();
@@ -42,7 +48,6 @@ public class ExpenseController {
             expense.setAmount(req.getAmount());
             expense.setDescription(req.getNote() == null ? "" : req.getNote());
 
-            // parse date if provided (frontend date format is yyyy-MM-dd)
             if (req.getDate() != null && !req.getDate().isEmpty()) {
                 expense.setDate(LocalDate.parse(req.getDate()));
             } else {
@@ -50,43 +55,45 @@ public class ExpenseController {
             }
 
             int result = expenseDAO.save(expense);
-            return (result > 0) ? ResponseEntity.ok("Expense saved successfully") :
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving expense");
+            response.put("message", (result > 0) ? "Expense saved successfully" : "Error saving expense");
+            return (result > 0)
+                    ? ResponseEntity.ok(response)
+                    : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
+            response.put("message", "Server error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
 
-    // Existing API: get by numeric user id (keeps backward compatibility)
-    @GetMapping("/{userId}")
-    public List<Expense> getExpensesById(@PathVariable int userId) {
-        return expenseDAO.findByUserId(userId);
-    }
-
-    // NEW: Get all expenses for a user by email
+    // 📜 Get all expenses by user email
     @GetMapping("/user/{email}")
-    public List<Expense> getExpensesByEmail(@PathVariable String email) {
-        return expenseDAO.findByUserEmail(email);
+    public ResponseEntity<List<Expense>> getExpensesByEmail(@PathVariable String email) {
+        List<Expense> expenses = expenseDAO.findByUserEmail(email);
+        return ResponseEntity.ok(expenses);
     }
 
     // ❌ Delete expense by ID
     @DeleteMapping("/{id}")
-    public String deleteExpense(@PathVariable int id) {
+    public ResponseEntity<Map<String, String>> deleteExpense(@PathVariable int id) {
         int result = expenseDAO.deleteById(id);
-        return (result > 0) ? "Expense deleted" : "Error deleting expense";
+        Map<String, String> response = new HashMap<>();
+        response.put("message", (result > 0) ? "Expense deleted successfully" : "Error deleting expense");
+        return (result > 0)
+                ? ResponseEntity.ok(response)
+                : ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
-    // Inner static DTO class to receive frontend POST body
+    // DTO for frontend
     public static class ExpenseRequest {
         private String email;
         private double amount;
         private String category;
-        private String wallet; // optional, saved client-side logic only
+        private String wallet;
         private String note;
         private String date;
 
-        // getters and setters
+        // Getters & Setters
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
 
