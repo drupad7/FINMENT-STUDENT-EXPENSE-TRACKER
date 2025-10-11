@@ -433,207 +433,136 @@
     </div>
   </div>
 </div>
-
 <script>
-  let users = [];
+    const BASE_URL = "http://localhost:8085/api/users";
 
-  function showNotification(message, isError = false) {
-      const notification = document.createElement('div');
-      notification.className = notification ${isError ? 'error' : ''};
+    /* 🔔 Notification helper */
+    function showNotification(message, isError = false) {
+      const notification = document.createElement("div");
+      notification.className = `notification ${isError ? "error" : ""}`;
       notification.textContent = message;
       document.body.appendChild(notification);
-
-      setTimeout(() => notification.classList.add('show'), 100);
+      setTimeout(() => notification.classList.add("show"), 100);
       setTimeout(() => {
-          notification.classList.remove('show');
-          setTimeout(() => notification.remove(), 400);
+        notification.classList.remove("show");
+        setTimeout(() => notification.remove(), 400);
       }, 3000);
-  }
+    }
 
-  function showLogin() {
-      document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
-      document.getElementById('loginForm').classList.add('active');
-      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById('loginToggle').classList.add('active');
-  }
+    /* 🔄 Toggle Forms */
+    function showLogin() {
+      document.querySelectorAll(".form").forEach(f => f.classList.remove("active"));
+      document.getElementById("loginForm").classList.add("active");
+      document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("loginToggle").classList.add("active");
+    }
 
-  function showRegister() {
-      document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
-      document.getElementById('registerForm').classList.add('active');
-      document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById('registerToggle').classList.add('active');
-  }
+    function showRegister() {
+      document.querySelectorAll(".form").forEach(f => f.classList.remove("active"));
+      document.getElementById("registerForm").classList.add("active");
+      document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById("registerToggle").classList.add("active");
+    }
 
-  function togglePassword(inputId) {
-      const input = document.getElementById(inputId);
-      const button = input.parentElement.querySelector('.password-toggle');
-
-      if (input.type === 'password') {
-          input.type = 'text';
-          button.textContent = '🙈';
+    /* 👁 Password visibility toggle */
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      const button = input.parentElement.querySelector(".password-toggle");
+      if (input.type === "password") {
+        input.type = "text";
+        button.textContent = "🙈";
       } else {
-          input.type = 'password';
-          button.textContent = '👁';
+        input.type = "password";
+        button.textContent = "👁";
       }
-  }
+    }
 
-  function isValidEmail(email) {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  }
-
-  function isStrongPassword(password) {
-      return password.length >= 6 &&
-             /[A-Za-z]/.test(password) &&
-             /[0-9]/.test(password);
-  }
-
-  function setLoading(button, isLoading) {
-      const btnText = button.querySelector('.btn-text');
+    /* ⏳ Button loading */
+    function setLoading(button, isLoading, text) {
+      const btnText = button.querySelector(".btn-text");
       if (isLoading) {
-          btnText.innerHTML = '<span class="loading"></span> Processing...';
-          button.disabled = true;
+        btnText.innerHTML = '<span class="loading"></span> Processing...';
+        button.disabled = true;
       } else {
-          button.disabled = false;
-          if (button.closest('#loginForm')) {
-              btnText.textContent = '🚀 Login';
-          } else {
-              btnText.textContent = '✨ Create Account';
-          }
+        button.disabled = false;
+        btnText.textContent = text;
       }
-  }
+    }
 
-  function simulateDelay() {
-      return new Promise(resolve => setTimeout(resolve, 1500));
-  }
-
-  function hashPassword(password) {
-      return btoa(password + 'finment_salt');
-  }
-
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    /* ✅ LOGIN */
+    document.getElementById("loginForm").addEventListener("submit", async e => {
       e.preventDefault();
-      const button = e.target.querySelector('.btn');
-      setLoading(button, true);
+      const button = e.target.querySelector(".btn");
+      setLoading(button, true, "🚀 Login");
 
-      const emailOrUsername = document.getElementById('loginEmail').value.trim();
-      const password = document.getElementById('loginPassword').value;
+      const email = document.getElementById("loginEmail").value.trim();
+      const password = document.getElementById("loginPassword").value.trim();
 
       try {
-          await simulateDelay();
+        const res = await fetch(`${BASE_URL}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
 
-          const user = users.find(u =>
-              u.email === emailOrUsername ||
-              u.username === emailOrUsername
-          );
+        const text = await res.text();
 
-          if (!user) {
-              throw new Error('User not found');
-          }
-
-          if (user.password !== hashPassword(password)) {
-              throw new Error('Invalid password');
-          }
-
-          showNotification(Welcome back, ${user.name}!);
-
-          setTimeout(() => {
-              showNotification('Login successful! 🎉');
-          }, 2000);
-
-      } catch (error) {
-          showNotification(error.message, true);
+        if (res.ok && text.toLowerCase().includes("success")) {
+          showNotification("✅ Login successful! Redirecting...");
+          localStorage.setItem("userEmail", email); // store session locally
+          setTimeout(() => (window.location.href = "index.html"), 1500);
+        } else {
+          showNotification(text || "Invalid credentials!", true);
+        }
+      } catch (err) {
+        showNotification("⚠️ Server not reachable. Please check backend.", true);
       } finally {
-          setLoading(button, false);
+        setLoading(button, false, "🚀 Login");
       }
-  });
+    });
 
-  document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    /* ✅ REGISTER */
+    document.getElementById("registerForm").addEventListener("submit", async e => {
       e.preventDefault();
-      const button = e.target.querySelector('.btn');
-      setLoading(button, true);
+      const button = e.target.querySelector(".btn");
+      setLoading(button, true, "✨ Create Account");
 
-      const name = document.getElementById('registerName').value.trim();
-      const username = document.getElementById('registerUsername').value.trim();
-      const email = document.getElementById('registerEmail').value.trim();
-      const password = document.getElementById('registerPassword').value;
-      const confirmPassword = document.getElementById('confirmPassword').value;
+      const name = document.getElementById("registerName").value.trim();
+      const username = document.getElementById("registerUsername").value.trim();
+      const email = document.getElementById("registerEmail").value.trim();
+      const password = document.getElementById("registerPassword").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+      if (password !== confirmPassword) {
+        showNotification("⚠️ Passwords do not match!", true);
+        setLoading(button, false, "✨ Create Account");
+        return;
+      }
 
       try {
-          await simulateDelay();
+        const res = await fetch(`${BASE_URL}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, username, email, password })
+        });
 
-          if (name.length < 2) {
-              throw new Error('Name must be at least 2 characters long');
-          }
+        const text = await res.text();
 
-          if (username.length < 3) {
-              throw new Error('Username must be at least 3 characters long');
-          }
-
-          if (!isValidEmail(email)) {
-              throw new Error('Please enter a valid email address');
-          }
-
-          if (!isStrongPassword(password)) {
-              throw new Error('Password must be at least 6 characters with letters and numbers');
-          }
-
-          if (password !== confirmPassword) {
-              throw new Error('Passwords do not match');
-          }
-
-          if (users.find(u => u.email === email)) {
-              throw new Error('Email already registered');
-          }
-
-          if (users.find(u => u.username === username)) {
-              throw new Error('Username already taken');
-          }
-
-          const newUser = {
-              id: Date.now().toString(),
-              name,
-              username,
-              email,
-              password: hashPassword(password),
-              createdAt: new Date().toISOString()
-          };
-
-          users.push(newUser);
-
-          showNotification('Account created successfully! You can now login.');
-
-          document.getElementById('registerForm').reset();
-          setTimeout(() => {
-              showLogin();
-              document.getElementById('loginEmail').value = username;
-          }, 1500);
-
-      } catch (error) {
-          showNotification(error.message, true);
+        if (res.ok && text.toLowerCase().includes("success")) {
+          showNotification("🎉 Registration complete! You can now login.");
+          setTimeout(showLogin, 1500);
+        } else {
+          showNotification(text || "⚠️ Registration failed!", true);
+        }
+      } catch (err) {
+        showNotification("⚠️ Server not reachable. Please check backend.", true);
       } finally {
-          setLoading(button, false);
+        setLoading(button, false, "✨ Create Account");
       }
-  });
-
-  function forgotPassword() {
-      const email = prompt('Enter your email address:');
-      if (email) {
-          if (users.find(u => u.email === email)) {
-              showNotification('Password reset link sent to your email!');
-          } else {
-              showNotification('Email not found', true);
-          }
-      }
-  }
-
-  users.push({
-      id: '1',
-      name: 'Demo User',
-      username: 'demo',
-      email: 'demo@finment.com',
-      password: hashPassword('demo123'),
-      createdAt: new Date().toISOString()
-  });
+    });
 </script>
+
+
+
 </body>
 </html>

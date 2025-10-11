@@ -13,19 +13,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login.html", "/index.html", "/css/**", "/js/**", "/images/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/**").permitAll()  // ✅ Allow API access
+                        .anyRequest().permitAll()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login.html")
-                        .defaultSuccessUrl("/index.html", true)
-                        .permitAll()
-                )
-                .logout(logout -> logout
-                        .logoutSuccessUrl("/login.html")
-                        .permitAll()
-                );
-
+                .formLogin(login -> login.disable())  // disable Spring's default login page
+                .httpBasic(httpBasic -> httpBasic.disable());
         return http.build();
     }
 }
