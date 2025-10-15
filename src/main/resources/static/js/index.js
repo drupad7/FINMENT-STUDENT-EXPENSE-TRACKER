@@ -1,5 +1,5 @@
-const BASE_URL = "http://localhost:8085/api/expenses";
-const BUDGET_URL = "http://localhost:8085/api/budget";
+const BASE_URL = "http://localhost:8080/api/expenses";
+const BUDGET_URL = "http://localhost:8080/api/budget";
 const userEmail = localStorage.getItem("userEmail");
 
 if (!userEmail) {

@@ -15,7 +15,7 @@ async function addExpense(event) {
     date: document.getElementById("date").value
   };
 
-  const response = await fetch("http://localhost:8085/api/expenses/add", {
+  const response = await fetch("http://localhost:8080/api/expenses/add", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(expense),
@@ -31,7 +31,7 @@ async function loadExpenses() {
   const list = document.getElementById("expenseList");
   list.innerHTML = "";
 
-  const response = await fetch(`http://localhost:8085/api/expenses/user/${email}`);
+  const response = await fetch(`http://localhost:8080/api/expenses/user/${email}`);
   const data = await response.json();
 
   data.forEach(exp => {
