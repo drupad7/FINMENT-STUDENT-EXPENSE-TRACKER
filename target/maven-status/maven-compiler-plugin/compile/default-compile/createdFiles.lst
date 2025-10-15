@@ -11,7 +11,6 @@ com\example\expensetracker\controller\IncomeController.class
 com\example\expensetracker\SecurityConfig.class
 com\example\expensetracker\controller\ExpenseController$TransferRequest.class
 com\example\expensetracker\model\Expense.class
-com\example\expensetracker\SecurityConfig$1.class
 com\example\expensetracker\service\ExpenseService.class
 com\example\expensetracker\dao\IncomeDAO.class
 com\example\expensetracker\dao\IncomeDAO$1.class
