@@ -6,6 +6,7 @@ com\example\expensetracker\model\Budget.class
 com\example\expensetracker\model\User.class
 com\example\expensetracker\controller\BudgetController.class
 com\example\expensetracker\dao\ExpenseDAO.class
+com\example\expensetracker\controller\HealthController.class
 com\example\expensetracker\dao\BudgetDAO.class
 com\example\expensetracker\controller\IncomeController.class
 com\example\expensetracker\SecurityConfig.class
