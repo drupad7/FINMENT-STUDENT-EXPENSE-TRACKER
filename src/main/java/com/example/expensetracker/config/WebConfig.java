@@ -1,3 +1,4 @@
+
 package com.example.expensetracker.config;
 
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +11,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                // ✅ Add your frontend URLs here
+                // ✅ Add your frontend URLs explicitly
                 .allowedOriginPatterns(
                         "https://finment-student-expense-tracker.onrender.com",
                         "http://localhost:5500"
