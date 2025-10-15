@@ -1,5 +1,5 @@
-const BASE_URL = BASE_URL = "https://finment-student-expense-tracker-production.up.railway.app/api/expenses";
-const BUDGET_URL = "https://finment-student-expense-tracker-production.up.railway.app/api/budget";
+const BASE_URL = "http://localhost:8080/api/expenses";
+const BUDGET_URL = "http://localhost:8080/api/budget";
 const userEmail = localStorage.getItem("userEmail");
 
 if (!userEmail) {

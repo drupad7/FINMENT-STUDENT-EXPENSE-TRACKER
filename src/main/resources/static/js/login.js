@@ -1,7 +1,6 @@
 (() => {
   // ================= CONFIG =================
-const BASE_URL = "https://finment-student-expense-tracker-production.up.railway.app";
- // same-origin (Spring Boot serves frontend)
+  const BASE_URL = ''; // same-origin (Spring Boot serves frontend)
   const ENDPOINTS = {
     login: '/api/auth/login',
     register: '/api/auth/register',
