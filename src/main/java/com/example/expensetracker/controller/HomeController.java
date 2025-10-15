@@ -10,4 +10,9 @@ public class HomeController {
     public String redirectToLogin() {
         return "redirect:/login.html";
     }
+
+    @GetMapping("/index")
+    public String showIndex() {
+        return "redirect:/index.html";
+    }
 }

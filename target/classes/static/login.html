@@ -1,568 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FinMent - Login & Register</title>
-  <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-
-    body {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-        background: #000000;
-        min-height: 100vh;
-        color: #e8f5e8;
-        overflow-x: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .floating-shapes {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: -1;
-    }
-
-    .shape {
-        position: absolute;
-        font-size: 100px;
-        color: rgba(64, 191, 64, 0.4);
-        animation: float 3s infinite linear;
-        pointer-events: none;
-        user-select: none;
-        font-weight: bold;
-        text-shadow: 0 0 10px rgba(64, 191, 64, 0.3);
-    }
-
-    .shape:nth-child(1) { font-size: 120px; top: 10%; left: 5%; animation-delay: 0s; animation-duration: 4s; }
-    .shape:nth-child(2) { font-size: 90px; top: 70%; left: 85%; animation-delay: 0.1s; animation-duration: 3.6s; }
-    .shape:nth-child(3) { font-size: 110px; top: 30%; left: 70%; animation-delay: 0.2s; animation-duration: 4.4s; }
-    .shape:nth-child(4) { font-size: 80px; top: 85%; left: 15%; animation-delay: 0.3s; animation-duration: 3.2s; }
-    .shape:nth-child(5) { font-size: 100px; top: 50%; left: 90%; animation-delay: 0.4s; animation-duration: 3.8s; }
-
-    @keyframes float {
-        0% {
-            transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
-            opacity: 0.2;
-        }
-        25% {
-            transform: translateY(-50px) translateX(30px) rotate(90deg) scale(1.2);
-            opacity: 0.4;
-        }
-        50% {
-            transform: translateY(-30px) translateX(-20px) rotate(180deg) scale(0.8);
-            opacity: 0.6;
-        }
-        75% {
-            transform: translateY(-80px) translateX(40px) rotate(270deg) scale(1.1);
-            opacity: 0.3;
-        }
-        100% {
-            transform: translateY(0px) translateX(0px) rotate(360deg) scale(1);
-            opacity: 0.2;
-        }
-    }
-
-    .container {
-        width: 100%;
-        max-width: 450px;
-        padding: 20px;
-    }
-
-    .auth-card {
-        background: rgba(45, 45, 45, 0.85);
-        backdrop-filter: blur(20px);
-        border: 1px solid rgba(64, 191, 64, 0.3);
-        border-radius: 24px;
-        padding: 40px;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .auth-card::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #40bf40, #32cd32, #00ff00);
-        border-radius: 24px 24px 0 0;
-    }
-
-    .auth-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 15px 35px rgba(64, 191, 64, 0.25);
-        border-color: rgba(64, 191, 64, 0.5);
-    }
-
-    .header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .header h1 {
-        font-size: 2.5rem;
-        font-weight: 900;
-        background: linear-gradient(45deg, #40bf40, #32cd32, #00ff00);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 0 30px rgba(64, 191, 64, 0.4);
-        margin-bottom: 10px;
-        animation: glow 3s ease-in-out infinite alternate;
-    }
-
-    @keyframes glow {
-        from { filter: drop-shadow(0 0 20px rgba(64, 191, 64, 0.3)); }
-        to { filter: drop-shadow(0 0 40px rgba(64, 191, 64, 0.6)); }
-    }
-
-    .subtitle {
-        font-size: 1rem;
-        opacity: 0.8;
-        color: #90ee90;
-        margin-bottom: 20px;
-    }
-
-    .form-toggle {
-        display: flex;
-        background: rgba(45, 45, 45, 0.7);
-        border-radius: 12px;
-        margin-bottom: 30px;
-        border: 1px solid rgba(64, 191, 64, 0.2);
-    }
-
-    .toggle-btn {
-        flex: 1;
-        padding: 12px 20px;
-        background: transparent;
-        border: none;
-        color: #90ee90;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        border-radius: 12px;
-        font-size: 14px;
-    }
-
-    .toggle-btn.active {
-        background: linear-gradient(135deg, #40bf40, #32cd32);
-        color: #000;
-        transform: scale(1.02);
-    }
-
-    .form-container {
-        position: relative;
-    }
-
-    .form {
-        display: none;
-        animation: slideIn 0.4s ease;
-    }
-
-    .form.active {
-        display: block;
-    }
-
-    @keyframes slideIn {
-        from { opacity: 0; transform: translateX(20px); }
-        to { opacity: 1; transform: translateX(0); }
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        font-size: 0.9rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        opacity: 0.9;
-        color: #90ee90;
-    }
-
-    .form-input {
-        width: 100%;
-        padding: 15px 20px;
-        background: rgba(45, 45, 45, 0.7);
-        border: 2px solid rgba(64, 191, 64, 0.3);
-        border-radius: 16px;
-        color: #e8f5e8;
-        font-size: 16px;
-        transition: all 0.3s ease;
-        backdrop-filter: blur(10px);
-    }
-
-    .form-input::placeholder {
-        color: rgba(232, 245, 232, 0.6);
-    }
-
-    .form-input:focus {
-        outline: none;
-        border-color: #40bf40;
-        background: rgba(45, 45, 45, 0.9);
-        transform: scale(1.02);
-        box-shadow: 0 0 20px rgba(64, 191, 64, 0.25);
-    }
-
-    .password-container {
-        position: relative;
-    }
-
-    .password-toggle {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        background: none;
-        border: none;
-        color: #40bf40;
-        cursor: pointer;
-        font-size: 1.2rem;
-        transition: all 0.3s ease;
-    }
-
-    .password-toggle:hover {
-        color: #32cd32;
-        transform: translateY(-50%) scale(1.1);
-    }
-
-    .btn {
-        width: 100%;
-        padding: 18px;
-        border: none;
-        border-radius: 16px;
-        font-size: 16px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        position: relative;
-        overflow: hidden;
-        color: #000;
-        margin-bottom: 15px;
-        background: linear-gradient(135deg, #40bf40 0%, #32cd32 100%);
-    }
-
-    .btn::before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 0;
-        height: 0;
-        background: rgba(0, 0, 0, 0.2);
-        border-radius: 50%;
-        transform: translate(-50%, -50%);
-        transition: all 0.5s ease;
-    }
-
-    .btn:hover::before {
-        width: 300px;
-        height: 300px;
-    }
-
-    .btn:hover {
-        transform: translateY(-3px) scale(1.05);
-        box-shadow: 0 10px 30px rgba(64, 191, 64, 0.3);
-    }
-
-    .btn:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    .forgot-password {
-        text-align: center;
-        margin-top: 15px;
-    }
-
-    .forgot-password a {
-        color: #40bf40;
-        text-decoration: none;
-        font-size: 0.9rem;
-        transition: all 0.3s ease;
-    }
-
-    .forgot-password a:hover {
-        color: #32cd32;
-        text-decoration: underline;
-    }
-
-    .notification {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 20px 30px;
-        background: linear-gradient(135deg, #40bf40, #32cd32);
-        color: #000;
-        border-radius: 16px;
-        font-weight: 600;
-        z-index: 1001;
-        transform: translateX(100%);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        box-shadow: 0 10px 30px rgba(64, 191, 64, 0.3);
-    }
-
-    .notification.error {
-        background: linear-gradient(135deg, #dc2626, #b91c1c);
-        color: #fff;
-    }
-
-    .notification.show {
-        transform: translateX(0);
-    }
-
-    .loading {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: #fff;
-        animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    @media (max-width: 480px) {
-        .container {
-            padding: 15px;
-        }
-
-        .auth-card {
-            padding: 30px 25px;
-        }
-
-        .header h1 {
-            font-size: 2rem;
-        }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinMent - Login & Signup</title>
+    <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
 <div class="floating-shapes">
-  <div class="shape">₹</div>
-  <div class="shape">₹</div>
-  <div class="shape">₹</div>
-  <div class="shape">₹</div>
-  <div class="shape">₹</div>
+    <div class="shape">₹</div>
+    <div class="shape">₹</div>
+    <div class="shape">₹</div>
+    <div class="shape">₹</div>
+    <div class="shape">₹</div>
+    <div class="shape">₹</div>
+    <div class="shape">₹</div>
+    <div class="shape">₹</div>
 </div>
 
 <div class="container">
-  <div class="auth-card">
-    <div class="header">
-      <h1>FinMent</h1>
-      <p class="subtitle">Your Personal Finance Mentor</p>
-    </div>
+    <div class="auth-card">
+        <div class="header">
+            <h1>FinMent</h1>
+            <p class="subtitle">Your Personal Finance Mentor</p>
+        </div>
 
-    <div class="form-toggle">
-      <button class="toggle-btn" id="loginToggle" onclick="showLogin()">Login</button>
-      <button class="toggle-btn active" id="registerToggle" onclick="showRegister()">Register</button>
-    </div>
+        <div id="apiStatus" class="api-status"></div>
 
-    <div class="form-container">
-      <form class="form" id="loginForm">
-        <div class="form-group">
-          <label class="form-label">Email or Username</label>
-          <input type="text" class="form-input" id="loginEmail" required placeholder="Enter your email or username">
+        <div class="form-toggle">
+            <button class="toggle-btn active" id="loginTab">Login</button>
+            <button class="toggle-btn" id="signupTab">Sign Up</button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <div class="password-container">
-            <input type="password" class="form-input" id="loginPassword" required placeholder="Enter your password">
-            <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁</button>
-          </div>
-        </div>
-        <button type="submit" class="btn">
-          <span class="btn-text">🚀 Login</span>
-        </button>
-        <div class="forgot-password">
-          <a href="#" onclick="forgotPassword(); return false;">Forgot Password?</a>
-        </div>
-      </form>
 
-      <form class="form active" id="registerForm">
-        <div class="form-group">
-          <label class="form-label">Full Name</label>
-          <input type="text" class="form-input" id="registerName" required placeholder="Enter your full name">
+        <!-- Login Form -->
+        <div class="form-container">
+            <form class="form active" id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="loginEmail" required placeholder="Enter your email">
+                    <div class="error-message" id="loginEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="password-container">
+                        <input type="password" class="form-input" id="loginPassword" required placeholder="Enter your password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('loginPassword')">👁</button>
+                    </div>
+                    <div class="error-message" id="loginPasswordError"></div>
+                </div>
+                <button type="submit" class="btn" id="loginBtn">
+                    <span class="btn-text">🚀 Login</span>
+                    <div class="spinner"></div>
+                </button>
+
+            </form>
+
+            <!-- Signup Form -->
+            <form class="form" id="signupForm">
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-input" id="signupName" required placeholder="Enter your full name">
+                    <div class="error-message" id="signupNameError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="signupEmail" required placeholder="Enter your email">
+                    <div class="error-message" id="signupEmailError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <div class="password-container">
+                        <input type="password" class="form-input" id="signupPassword" required placeholder="Create a strong password (min 6 characters)">
+                        <button type="button" class="password-toggle" onclick="togglePassword('signupPassword')">👁</button>
+                    </div>
+                    <div class="error-message" id="signupPasswordError"></div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Confirm Password</label>
+                    <div class="password-container">
+                        <input type="password" class="form-input" id="confirmPassword" required placeholder="Confirm your password">
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁</button>
+                    </div>
+                    <div class="error-message" id="confirmPasswordError"></div>
+                </div>
+                <button type="submit" class="btn" id="signupBtn">
+                    <span class="btn-text">✨ Create Account</span>
+                    <div class="spinner"></div>
+                </button>
+            </form>
         </div>
-        <div class="form-group">
-          <label class="form-label">Username</label>
-          <input type="text" class="form-input" id="registerUsername" required placeholder="Choose a username">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Email</label>
-          <input type="email" class="form-input" id="registerEmail" required placeholder="Enter your email">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Password</label>
-          <div class="password-container">
-            <input type="password" class="form-input" id="registerPassword" required placeholder="Create a strong password">
-            <button type="button" class="password-toggle" onclick="togglePassword('registerPassword')">👁</button>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Confirm Password</label>
-          <div class="password-container">
-            <input type="password" class="form-input" id="confirmPassword" required placeholder="Confirm your password">
-            <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword')">👁</button>
-          </div>
-        </div>
-        <button type="submit" class="btn">
-          <span class="btn-text">✨ Create Account</span>
-        </button>
-      </form>
     </div>
-  </div>
 </div>
-<script>
-    const BASE_URL = "http://localhost:8085/api/users";
-
-    /* 🔔 Notification helper */
-    function showNotification(message, isError = false) {
-      const notification = document.createElement("div");
-      notification.className = `notification ${isError ? "error" : ""}`;
-      notification.textContent = message;
-      document.body.appendChild(notification);
-      setTimeout(() => notification.classList.add("show"), 100);
-      setTimeout(() => {
-        notification.classList.remove("show");
-        setTimeout(() => notification.remove(), 400);
-      }, 3000);
-    }
-
-    /* 🔄 Toggle Forms */
-    function showLogin() {
-      document.querySelectorAll(".form").forEach(f => f.classList.remove("active"));
-      document.getElementById("loginForm").classList.add("active");
-      document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
-      document.getElementById("loginToggle").classList.add("active");
-    }
-
-    function showRegister() {
-      document.querySelectorAll(".form").forEach(f => f.classList.remove("active"));
-      document.getElementById("registerForm").classList.add("active");
-      document.querySelectorAll(".toggle-btn").forEach(b => b.classList.remove("active"));
-      document.getElementById("registerToggle").classList.add("active");
-    }
-
-    /* 👁 Password visibility toggle */
-    function togglePassword(id) {
-      const input = document.getElementById(id);
-      const button = input.parentElement.querySelector(".password-toggle");
-      if (input.type === "password") {
-        input.type = "text";
-        button.textContent = "🙈";
-      } else {
-        input.type = "password";
-        button.textContent = "👁";
-      }
-    }
-
-    /* ⏳ Button loading */
-    function setLoading(button, isLoading, text) {
-      const btnText = button.querySelector(".btn-text");
-      if (isLoading) {
-        btnText.innerHTML = '<span class="loading"></span> Processing...';
-        button.disabled = true;
-      } else {
-        button.disabled = false;
-        btnText.textContent = text;
-      }
-    }
-
-    /* ✅ LOGIN */
-    document.getElementById("loginForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const button = e.target.querySelector(".btn");
-      setLoading(button, true, "🚀 Login");
-
-      const email = document.getElementById("loginEmail").value.trim();
-      const password = document.getElementById("loginPassword").value.trim();
-
-      try {
-        const res = await fetch(`${BASE_URL}/login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password })
-        });
-
-        const text = await res.text();
-
-        if (res.ok && text.toLowerCase().includes("success")) {
-          showNotification("✅ Login successful! Redirecting...");
-          localStorage.setItem("userEmail", email); // store session locally
-          setTimeout(() => (window.location.href = "index.html"), 1500);
-        } else {
-          showNotification(text || "Invalid credentials!", true);
-        }
-      } catch (err) {
-        showNotification("⚠️ Server not reachable. Please check backend.", true);
-      } finally {
-        setLoading(button, false, "🚀 Login");
-      }
-    });
-
-    /* ✅ REGISTER */
-    document.getElementById("registerForm").addEventListener("submit", async e => {
-      e.preventDefault();
-      const button = e.target.querySelector(".btn");
-      setLoading(button, true, "✨ Create Account");
-
-      const name = document.getElementById("registerName").value.trim();
-      const username = document.getElementById("registerUsername").value.trim();
-      const email = document.getElementById("registerEmail").value.trim();
-      const password = document.getElementById("registerPassword").value.trim();
-      const confirmPassword = document.getElementById("confirmPassword").value.trim();
-
-      if (password !== confirmPassword) {
-        showNotification("⚠️ Passwords do not match!", true);
-        setLoading(button, false, "✨ Create Account");
-        return;
-      }
-
-      try {
-        const res = await fetch(`${BASE_URL}/register`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, username, email, password })
-        });
-
-        const text = await res.text();
-
-        if (res.ok && text.toLowerCase().includes("success")) {
-          showNotification("🎉 Registration complete! You can now login.");
-          setTimeout(showLogin, 1500);
-        } else {
-          showNotification(text || "⚠️ Registration failed!", true);
-        }
-      } catch (err) {
-        showNotification("⚠️ Server not reachable. Please check backend.", true);
-      } finally {
-        setLoading(button, false, "✨ Create Account");
-      }
-    });
-</script>
-
-
-
+<script src="js/login.js"></script>
 </body>
 </html>

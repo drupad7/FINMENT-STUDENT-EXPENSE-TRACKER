@@ -1,15 +1,9 @@
 package com.example.expensetracker.controller;
 
-import com.example.expensetracker.dao.ExpenseDAO;
-import com.example.expensetracker.dao.UserDAO;
 import com.example.expensetracker.model.Expense;
-import com.example.expensetracker.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import com.example.expensetracker.service.ExpenseService;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -17,90 +11,50 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class ExpenseController {
 
-    @Autowired
-    private ExpenseDAO expenseDAO;
+    private final ExpenseService service;
 
-    @Autowired
-    private UserDAO userDAO;
-
-    // ➕ Add new expense (frontend posts to /api/expenses/add with { email, amount, category, wallet, note, date })
-    @PostMapping("/add")
-    public ResponseEntity<String> addExpenseByEmail(@RequestBody ExpenseRequest req) {
-        try {
-            if (req.getEmail() == null || req.getEmail().isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email required");
-            }
-
-            User user = userDAO.findByEmail(req.getEmail());
-            if (user == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found");
-            }
-
-            Expense expense = new Expense();
-            expense.setUserId(user.getId());
-            expense.setCategory(req.getCategory() == null ? "Other" : req.getCategory());
-            expense.setAmount(req.getAmount());
-            expense.setDescription(req.getNote() == null ? "" : req.getNote());
-
-            // parse date if provided (frontend date format is yyyy-MM-dd)
-            if (req.getDate() != null && !req.getDate().isEmpty()) {
-                expense.setDate(LocalDate.parse(req.getDate()));
-            } else {
-                expense.setDate(LocalDate.now());
-            }
-
-            int result = expenseDAO.save(expense);
-            return (result > 0) ? ResponseEntity.ok("Expense saved successfully") :
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving expense");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + e.getMessage());
-        }
+    public ExpenseController(ExpenseService service) {
+        this.service = service;
     }
 
-    // Existing API: get by numeric user id (keeps backward compatibility)
-    @GetMapping("/{userId}")
-    public List<Expense> getExpensesById(@PathVariable int userId) {
-        return expenseDAO.findByUserId(userId);
-    }
-
-    // NEW: Get all expenses for a user by email
     @GetMapping("/user/{email}")
-    public List<Expense> getExpensesByEmail(@PathVariable String email) {
-        return expenseDAO.findByUserEmail(email);
+    public List<Expense> getUserExpenses(@PathVariable String email) {
+        return service.getExpenses(email);
     }
 
-    // ❌ Delete expense by ID
-    @DeleteMapping("/{id}")
-    public String deleteExpense(@PathVariable int id) {
-        int result = expenseDAO.deleteById(id);
-        return (result > 0) ? "Expense deleted" : "Error deleting expense";
+    @PostMapping("/add")
+    public void addExpense(@RequestBody Expense expense) {
+        service.addExpense(expense);
     }
 
-    // Inner static DTO class to receive frontend POST body
-    public static class ExpenseRequest {
+    @PostMapping("/transfer")
+    public void transfer(@RequestBody TransferRequest request) {
+        service.transfer(request.getEmail(), request.getFromWallet(), request.getToWallet(), request.getAmount(), request.getDescription(), request.getDate());
+    }
+
+    // DTO for transfer request
+    public static class TransferRequest {
         private String email;
+        private String fromWallet;
+        private String toWallet;
         private double amount;
-        private String category;
-        private String wallet; // optional, saved client-side logic only
-        private String note;
+        private String description;
         private String date;
 
-        // getters and setters
         public String getEmail() { return email; }
         public void setEmail(String email) { this.email = email; }
+
+        public String getFromWallet() { return fromWallet; }
+        public void setFromWallet(String fromWallet) { this.fromWallet = fromWallet; }
+
+        public String getToWallet() { return toWallet; }
+        public void setToWallet(String toWallet) { this.toWallet = toWallet; }
 
         public double getAmount() { return amount; }
         public void setAmount(double amount) { this.amount = amount; }
 
-        public String getCategory() { return category; }
-        public void setCategory(String category) { this.category = category; }
-
-        public String getWallet() { return wallet; }
-        public void setWallet(String wallet) { this.wallet = wallet; }
-
-        public String getNote() { return note; }
-        public void setNote(String note) { this.note = note; }
+        public String getDescription() { return description; }
+        public void setDescription(String description) { this.description = description; }
 
         public String getDate() { return date; }
         public void setDate(String date) { this.date = date; }

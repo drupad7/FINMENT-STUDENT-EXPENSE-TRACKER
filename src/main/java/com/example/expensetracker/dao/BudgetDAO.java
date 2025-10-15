@@ -1,48 +1,54 @@
 package com.example.expensetracker.dao;
 
+import com.example.expensetracker.model.Budget;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
-import java.util.Map;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Repository
 public class BudgetDAO {
+
     private final JdbcTemplate jdbcTemplate;
 
     public BudgetDAO(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Double getBudgetLimit(int userId, String month) {
-        String sql = "SELECT limit_amount FROM budgets WHERE user_id = ? AND month = ?";
+    private final RowMapper<Budget> rowMapper = (ResultSet rs, int rowNum) -> {
+        Budget b = new Budget();
+        b.setId(rs.getInt("id"));
+        b.setEmail(rs.getString("email"));
+        b.setMonth(rs.getInt("month"));
+        b.setYear(rs.getInt("year"));
+        b.setLimitAmount(rs.getDouble("limit_amount"));
+        return b;
+    };
+
+    // Fetch budget by email, month, year
+    public Budget getBudget(String email, int month, int year) {
+        String sql = "SELECT * FROM budgets WHERE email = ? AND month = ? AND year = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, Double.class, userId, month);
+            return jdbcTemplate.queryForObject(sql, rowMapper, email, month, year);
         } catch (Exception e) {
-            return null;
+            return null; // no budget set
         }
     }
 
-    public void setOrUpdateBudget(int userId, String month, double limitAmount) {
-        String checkSql = "SELECT COUNT(*) FROM budgets WHERE user_id = ? AND month = ?";
-        int count = jdbcTemplate.queryForObject(checkSql, Integer.class, userId, month);
-
-        if (count > 0) {
-            String updateSql = "UPDATE budgets SET limit_amount = ? WHERE user_id = ? AND month = ?";
-            jdbcTemplate.update(updateSql, limitAmount, userId, month);
+    // Add or update budget
+    public void setBudget(Budget budget) {
+        String sqlCheck = "SELECT COUNT(*) FROM budgets WHERE email = ? AND month = ? AND year = ?";
+        Integer count = jdbcTemplate.queryForObject(sqlCheck, Integer.class, budget.getEmail(), budget.getMonth(), budget.getYear());
+        if (count != null && count > 0) {
+            // update existing
+            String sqlUpdate = "UPDATE budgets SET limit_amount = ? WHERE email = ? AND month = ? AND year = ?";
+            jdbcTemplate.update(sqlUpdate, budget.getLimitAmount(), budget.getEmail(), budget.getMonth(), budget.getYear());
         } else {
-            String insertSql = "INSERT INTO budgets (user_id, month, limit_amount) VALUES (?, ?, ?)";
-            jdbcTemplate.update(insertSql, userId, month, limitAmount);
+            // insert new
+            String sqlInsert = "INSERT INTO budgets (email, month, year, limit_amount) VALUES (?, ?, ?, ?)";
+            jdbcTemplate.update(sqlInsert, budget.getEmail(), budget.getMonth(), budget.getYear(), budget.getLimitAmount());
         }
-    }
-
-    public double getTotalSpent(int userId, String month) {
-        String sql = "SELECT COALESCE(SUM(amount), 0) FROM expenses WHERE user_id = ? AND MONTH(date) = ?";
-        return jdbcTemplate.queryForObject(sql, Double.class, userId, month);
-    }
-
-    public Map<String, Object> getMonthlySummary(int userId, String month) {
-        Double limit = getBudgetLimit(userId, month);
-        double spent = getTotalSpent(userId, month);
-        double remaining = (limit == null) ? 0 : (limit - spent);
-        return Map.of("limit", limit != null ? limit : 0, "spent", spent, "remaining", remaining);
     }
 }

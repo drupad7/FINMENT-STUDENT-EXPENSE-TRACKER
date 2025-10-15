@@ -1,0 +1,364 @@
+  * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            color: #e8f5e8;
+            overflow-x: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .floating-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            font-size: 100px;
+            color: rgba(64, 191, 64, 0.4);
+            animation: float 3s infinite linear;
+            pointer-events: none;
+            user-select: none;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(64, 191, 64, 0.3);
+        }
+
+        .shape:nth-child(1) { font-size: 120px; top: 10%; left: 5%; animation-delay: 0s; animation-duration: 4s; }
+        .shape:nth-child(2) { font-size: 90px; top: 70%; left: 85%; animation-delay: 0.5s; animation-duration: 3.6s; }
+        .shape:nth-child(3) { font-size: 110px; top: 30%; left: 70%; animation-delay: 1s; animation-duration: 4.4s; }
+        .shape:nth-child(4) { font-size: 80px; top: 85%; left: 15%; animation-delay: 1.5s; animation-duration: 3.2s; }
+        .shape:nth-child(5) { font-size: 100px; top: 50%; left: 90%; animation-delay: 2s; animation-duration: 3.8s; }
+        .shape:nth-child(6) { font-size: 130px; top: 5%; left: 50%; animation-delay: 2.5s; animation-duration: 5s; }
+        .shape:nth-child(7) { font-size: 70px; top: 60%; left: 5%; animation-delay: 3s; animation-duration: 3.4s; }
+        .shape:nth-child(8) { font-size: 96px; top: 90%; left: 60%; animation-delay: 3.5s; animation-duration: 4.2s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translateY(-50px) translateX(30px) rotate(90deg) scale(1.2);
+                opacity: 0.5;
+            }
+            50% {
+                transform: translateY(-30px) translateX(-20px) rotate(180deg) scale(0.8);
+                opacity: 0.7;
+            }
+            75% {
+                transform: translateY(-80px) translateX(40px) rotate(270deg) scale(1.1);
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(0px) translateX(0px) rotate(360deg) scale(1);
+                opacity: 0.3;
+            }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-card {
+            background: rgba(45, 45, 45, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(64, 191, 64, 0.3);
+            border-radius: 24px;
+            padding: 40px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .auth-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #40bf40, #32cd32, #00ff00);
+            border-radius: 24px 24px 0 0;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #40bf40, #32cd32, #00ff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            color: #90ee90;
+            margin-bottom: 20px;
+        }
+
+        .form-toggle {
+            display: flex;
+            background: rgba(20, 20, 20, 0.7);
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(64, 191, 64, 0.2);
+            overflow: hidden;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 12px 20px;
+            background: transparent;
+            border: none;
+            color: #90ee90;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, #40bf40, #32cd32);
+            color: #000;
+        }
+
+        .form-container {
+            position: relative;
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #90ee90;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid rgba(64, 191, 64, 0.3);
+            border-radius: 12px;
+            color: #e8f5e8;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input::placeholder {
+            color: rgba(232, 245, 232, 0.5);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #40bf40;
+            background: rgba(20, 20, 20, 0.95);
+            box-shadow: 0 0 20px rgba(64, 191, 64, 0.2);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #40bf40;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .password-toggle:hover {
+            color: #32cd32;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #000;
+            margin-top: 10px;
+            background: linear-gradient(135deg, #40bf40 0%, #32cd32 100%);
+            position: relative;
+        }
+
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(64, 191, 64, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 3px solid rgba(0, 0, 0, 0.3);
+            border-top-color: #000;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        .btn.loading .btn-text {
+            display: none;
+        }
+
+        .btn.loading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .forgot-password a {
+            color: #40bf40;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password a:hover {
+            color: #32cd32;
+            text-decoration: underline;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 18px 25px;
+            background: linear-gradient(135deg, #40bf40, #32cd32);
+            color: #000;
+            border-radius: 12px;
+            font-weight: 600;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: transform 0.4s ease;
+            box-shadow: 0 10px 30px rgba(64, 191, 64, 0.4);
+            max-width: 350px;
+        }
+
+        .notification.error {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .api-status {
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            display: none;
+        }
+
+        .api-status.connected {
+            background: rgba(64, 191, 64, 0.2);
+            color: #40bf40;
+            border: 1px solid rgba(64, 191, 64, 0.3);
+            display: block;
+        }
+
+        .api-status.disconnected {
+            background: rgba(220, 38, 38, 0.2);
+            color: #dc2626;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 15px;
+            }
+
+            .auth-card {
+                padding: 30px 25px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }

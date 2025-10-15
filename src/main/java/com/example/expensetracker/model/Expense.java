@@ -1,55 +1,33 @@
 package com.example.expensetracker.model;
 
-import java.time.LocalDate;
-
 public class Expense {
     private int id;
-    private int userId;
-    private String category;
+    private String email;
     private double amount;
+    private String category;
+    private String wallet;
     private String description;
-    private LocalDate date;
+    private String date;
 
-    // Getters and Setters
-    public int getId() {
-        return id;
-    }
-    public void setId(int id) {
-        this.id = id;
-    }
+    // Getters and setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public int getUserId() {
-        return userId;
-    }
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getCategory() {
-        return category;
-    }
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    public double getAmount() { return amount; }
+    public void setAmount(double amount) { this.amount = amount; }
 
-    public double getAmount() {
-        return amount;
-    }
-    public void setAmount(double amount) {
-        this.amount = amount;
-    }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
 
-    public String getDescription() {
-        return description;
-    }
-    public void setDescription(String description) {
-        this.description = description;
-    }
+    public String getWallet() { return wallet; }
+    public void setWallet(String wallet) { this.wallet = wallet; }
 
-    public LocalDate getDate() {
-        return date;
-    }
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+
+    public String getDate() { return date; }
+    public void setDate(String date) { this.date = date; }
 }

@@ -2,24 +2,24 @@ package com.example.expensetracker.model;
 
 public class Income {
     private int id;
-    private int userId; // ✅ add this
+    private int userId;
     private double amount;
-    private String wallet;
     private String source;
     private String date;
+    private String paymentMethod;
 
-    // ✅ Add a constructor (optional)
     public Income() {}
 
-    public Income(int id, double amount, String wallet, String source, String date) {
+    public Income(int id, int userId, double amount, String source, String date, String paymentMethod) {
         this.id = id;
+        this.userId = userId;
         this.amount = amount;
-        this.wallet = wallet;
         this.source = source;
         this.date = date;
+        this.paymentMethod = paymentMethod;
     }
 
-    // ✅ Getters and Setters
+    // Getters and Setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 
@@ -29,12 +29,12 @@ public class Income {
     public double getAmount() { return amount; }
     public void setAmount(double amount) { this.amount = amount; }
 
-    public String getWallet() { return wallet; }
-    public void setWallet(String wallet) { this.wallet = wallet; }
-
     public String getSource() { return source; }
     public void setSource(String source) { this.source = source; }
 
     public String getDate() { return date; }
     public void setDate(String date) { this.date = date; }
+
+    public String getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
 }

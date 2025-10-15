@@ -3,8 +3,11 @@ package com.example.expensetracker.dao;
 import com.example.expensetracker.model.Expense;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -13,30 +16,38 @@ public class ExpenseDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public int save(Expense expense) {
-        String sql = "INSERT INTO expenses (user_id, category, amount, description, date, wallet) VALUES (?, ?, ?, ?, ?, ?)";
-        return jdbcTemplate.update(sql, expense.getUserId(), expense.getCategory(),
-                expense.getAmount(), expense.getDescription(), expense.getDate());
+    // Add expense/income
+    public void addExpense(Expense e) {
+        String sql = "INSERT INTO expenses (email, amount, category, wallet, description, date) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sql, e.getEmail(), e.getAmount(), e.getCategory(), e.getWallet(), e.getDescription(), e.getDate());
     }
 
-    public List<Expense> findByUserId(int userId) {
-        String sql = "SELECT * FROM expenses WHERE user_id = ?";
-        return jdbcTemplate.query(sql, new ExpenseMapper(), userId);
+    // Get all expenses for a user
+    public List<Expense> getExpensesByEmail(String email) {
+        String sql = "SELECT * FROM expenses WHERE email = ?";
+        return jdbcTemplate.query(sql, new Object[]{email}, new RowMapper<Expense>() {
+            public Expense mapRow(ResultSet rs, int rowNum) throws SQLException {
+                Expense e = new Expense();
+                e.setId(rs.getInt("id"));
+                e.setEmail(rs.getString("email"));
+                e.setAmount(rs.getDouble("amount"));
+                e.setCategory(rs.getString("category"));
+                e.setWallet(rs.getString("wallet"));
+                e.setDescription(rs.getString("description"));
+                e.setDate(rs.getString("date"));
+                return e;
+            }
+        });
     }
 
-    // NEW: find expenses by user's email (join with users table)
-    public List<Expense> findByUserEmail(String email) {
-        String sql = "SELECT e.* FROM expenses e JOIN users u ON e.user_id = u.id WHERE u.email = ?";
-        return jdbcTemplate.query(sql, new ExpenseMapper(), email);
-    }
+    // Wallet transfer: creates two transactions
+    public void transfer(String email, String fromWallet, String toWallet, double amount, String description, String date) {
+        // Deduct from fromWallet
+        String sqlDeduct = "INSERT INTO expenses (email, amount, category, wallet, description, date) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlDeduct, email, -amount, "Transfer", fromWallet, description + " (deducted)", date);
 
-    public List<Expense> findAll() {
-        String sql = "SELECT * FROM expenses";
-        return jdbcTemplate.query(sql, new ExpenseMapper());
-    }
-
-    public int deleteById(int id) {
-        String sql = "DELETE FROM expenses WHERE id = ?";
-        return jdbcTemplate.update(sql, id);
+        // Add to toWallet
+        String sqlAdd = "INSERT INTO expenses (email, amount, category, wallet, description, date) VALUES (?, ?, ?, ?, ?, ?)";
+        jdbcTemplate.update(sqlAdd, email, amount, "Transfer", toWallet, description + " (added)", date);
     }
 }

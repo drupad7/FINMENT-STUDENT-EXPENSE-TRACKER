@@ -9,25 +9,25 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin(origins = "*")
 public class UserController {
 
-    private UserDAO UserDAO;
+    private final UserDAO userDAO;
 
-    public UserController(UserDAO UserDAO) {
-        this.UserDAO = UserDAO;
-    }
-
-    @PostMapping("/login")
-    public String loginUser(@RequestBody User user) {
-        User existingUser = UserDAO.findByEmail(user.getEmail());
-        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
-            return "Login successful!";
-        } else {
-            return "Invalid email or password!";
-        }
+    public UserController(UserDAO userDAO) {
+        this.userDAO = userDAO;
     }
 
     @PostMapping("/register")
     public String registerUser(@RequestBody User user) {
-        UserDAO.registerUser(user);
+        userDAO.registerUser(user);
         return "User registered successfully!";
+    }
+
+    @PostMapping("/login")
+    public String loginUser(@RequestBody User user) {
+        User existingUser = userDAO.findByEmail(user.getEmail());
+        if (existingUser != null && existingUser.getPassword().equals(user.getPassword())) {
+            return "success";
+        } else {
+            return "Invalid email or password!";
+        }
     }
 }

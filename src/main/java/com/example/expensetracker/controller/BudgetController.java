@@ -1,47 +1,31 @@
 package com.example.expensetracker.controller;
 
-import com.example.expensetracker.dao.BudgetDAO;
-import com.example.expensetracker.dao.UserDAO;
+import com.example.expensetracker.model.Budget;
+import com.example.expensetracker.service.BudgetService;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/budget")
-@CrossOrigin(origins = "*")
 public class BudgetController {
 
-    private final BudgetDAO budgetDao;
-    private final UserDAO userDao;
+    private final BudgetService budgetService;
 
-    public BudgetController(BudgetDAO budgetDao, UserDAO userDao) {
-        this.budgetDao = budgetDao;  // ✅ Corrected assignment
-        this.userDao = userDao;      // ✅ Corrected assignment
+    public BudgetController(BudgetService budgetService) {
+        this.budgetService = budgetService;
     }
 
-    // ✅ Fetch monthly summary
+    // GET budget for specific month/year
     @GetMapping("/{email}/{month}")
-    public Map<String, Object> getMonthlyBudget(@PathVariable String email, @PathVariable String month) {
-        Integer userId = userDao.getUserIdByEmail(email);
-        if (userId == null) {
-            return Map.of("error", "User not found for email: " + email);
-        }
-        return budgetDao.getMonthlySummary(userId, month);
+    public Budget getBudget(@PathVariable String email, @PathVariable int month) {
+        Budget b = budgetService.getMonthlyBudget(email, month, java.time.Year.now().getValue());
+        if (b == null) return new Budget(email, month, java.time.Year.now().getValue(), 0.0);
+        return b;
     }
 
-    // ✅ Set or update monthly budget
+    // POST to set or update budget
     @PostMapping("/set")
-    public Map<String, Object> setBudget(@RequestBody Map<String, Object> payload) {
-        String email = (String) payload.get("email");
-        String month = (String) payload.get("month");
-        double limit = Double.parseDouble(payload.get("limit").toString());
-
-        Integer userId = userDao.getUserIdByEmail(email);
-        if (userId == null) {
-            return Map.of("error", "User not found for email: " + email);
-        }
-
-        budgetDao.setOrUpdateBudget(userId, month, limit);
-        return Map.of("message", "Budget set successfully", "limit", limit);
+    public String setBudget(@RequestBody Budget budget) {
+        budgetService.setMonthlyBudget(budget.getEmail(), budget.getLimitAmount(), budget.getMonth(), budget.getYear());
+        return "Budget set successfully!";
     }
 }
