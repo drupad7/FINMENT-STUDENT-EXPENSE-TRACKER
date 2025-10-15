@@ -15,7 +15,7 @@ async function addExpense(event) {
     date: document.getElementById("date").value
   };
 
-  const response = await fetch("http://localhost:8080/api/expenses/add", {
+  const response = await fetch("https://finment-student-expense-tracker-production.up.railway.app/api/expenses/add", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(expense),
