@@ -18,6 +18,7 @@ com\example\expensetracker\ExpenseTrackerApplication.class
 com\example\expensetracker\dao\UserDAO.class
 com\example\expensetracker\model\Income.class
 com\example\expensetracker\config\DatabaseConfig.class
+com\example\expensetracker\config\WebConfig.class
 com\example\expensetracker\controller\ExpenseController.class
 com\example\expensetracker\controller\SummaryController.class
 com\example\expensetracker\dao\ExpenseDAO$1.class

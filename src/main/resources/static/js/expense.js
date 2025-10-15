@@ -31,7 +31,7 @@ async function loadExpenses() {
   const list = document.getElementById("expenseList");
   list.innerHTML = "";
 
-  const response = await fetch(https://finment-student-expense-tracker.onrender.com/api/expenses/user/${email}`);
+  const response = await fetch("https://finment-student-expense-tracker.onrender.com/api/expenses/user/${email}");
   const data = await response.json();
 
   data.forEach(exp => {
