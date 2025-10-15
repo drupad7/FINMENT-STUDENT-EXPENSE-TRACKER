@@ -14,10 +14,11 @@ public class WebConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
+                        // ✅ use allowedOriginPatterns instead of allowedOrigins
                         .allowedOriginPatterns(
                                 "https://finment-student-expense-tracker.onrender.com",
-                                "http://localhost:5500",   // add your dev URL if needed
-                                "https://finment-frontend.onrender.com" // example
+                                "http://localhost:5500",
+                                "https://finment-frontend.onrender.com"
                         )
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
